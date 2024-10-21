@@ -1,3 +1,4 @@
+import argparse
 import time
 from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from kortex_api.autogen.client_stubs.BaseCyclicClientRpc import BaseCyclicClient
@@ -96,22 +97,26 @@ if __name__ == "__main__":
     import threading
 
     # Create connection to the robot
-    parser = utilities.DeviceConnection.createArgumentParser() if hasattr(utilities.DeviceConnection, 'createArgumentParser') else utilities.parseArguments()
-    args = parser.parse_args()
-    router = utilities.DeviceConnection.createTcpConnection(args)
-    router.connect()
+    parser = argparse.ArgumentParser(description='Robot connection arguments')
+    parser.add_argument('--ip', type=str, required=True, help='IP address of the robot')
+    parser.add_argument('--port', type=int, default=10000, help='Port number for the robot connection')
+    args = parser.parse_args(['--ip', '192.168.1.10'])  # Replace '192.168.1.10' with the actual IP address of your robot
+    # args = utilities.parseConnectionArguments()
+    with utilities.DeviceConnection.createTcpConnection(args) as router, utilities.DeviceConnection.createUdpConnection(
+            args) as router_real_time:
+        router.connect()
 
-    base_client = BaseClient(router)
-    base_cyclic_client = BaseCyclicClient(router)
+        base_client = BaseClient(router)
+        base_cyclic_client = BaseCyclicClient(router)
 
-    # Define start and target positions
-    start_position = [0.4, 0.0, 0.2]  # Example coordinates for picking
-    target_position = [0.6, 0.2, 0.3]  # Example coordinates for placing
+        # Define start and target positions
+        start_position = [0.443, -0.449, 0.13]  # Example coordinates for picking
+        target_position = [0.6, 0.2, 0.3]  # Example coordinates for placing
 
-    try:
-        # Perform the move, pick, and place operation
-        move_pick_and_place(base_client, base_cyclic_client, start_position, target_position)
-    except Exception as e:
-        print(f"An error occurred: {e}")
-    finally:
-        router.disconnect()
+        try:
+            # Perform the move, pick, and place operation
+            move_pick_and_place(base_client, base_cyclic_client, start_position, target_position)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            router.disconnect()

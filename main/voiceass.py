@@ -7,7 +7,7 @@ import time
 import cv2
 import pyttsx3
 import speech_recognition as sr
-import imageCapture as ic
+# import imageCapture as ic
 
 from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from kortex_api.autogen.client_stubs.BaseCyclicClientRpc import BaseCyclicClient
@@ -1100,32 +1100,24 @@ def main():
                 success &= turn_around(base, base_cyclic)
             elif command1 == 'hold object':
                 success &= gripper_close_new(base)
-            elif command1 == 'open gripper' or 'drop':
-                success &= open_gripper(base)
-            elif command1 == 'capture image':
-                speak_text("Please hold the image for 5 seconds")
-                ic.capture_image(0)
             elif command1 == 'stop':
-                speak_text('okay, Thank you for working to improve my capabilities. Bye for now!')
-                success &= move_to_home_position(base)
+                speak_text("Thank you Very much!")
+                success &= move_to_rest_position(base)
                 break
             elif command1 == 'pick up':
-                speak_text("Sure sir, starting the pick up routine.")
-                # Example core
-                success = True
+                speak_text("Sure, Starting Pickup Routine")
+                # Example Core
+                success =True
                 iteration = 1
-                speak_text("which product should i pick up?")
+                speak_text("Which product should I pick up?")
                 vis_pos_str = listen()
-                # vis_pos_list=vis_pos_str.split()
                 if vis_pos_str[-1] == 'one' or '1':
                     vis_pos = 1
                 elif vis_pos_str[-1] == 'two' or '2':
                     vis_pos = 2
-
                 success &= move_to_home_position(base)
                 success &= open_gripper(base)
                 while iteration < 2:
-
                     if vis_pos == 1:
                         success &= move_to_vision_position_1(base)
                         success &= cartesian_action_movement_pick(base, base_cyclic)
@@ -1136,7 +1128,6 @@ def main():
                         success &= open_gripper(base)
                         success &= cartesian_action_movement_up(base, base_cyclic)
                         success &= move_to_home_position(base)
-
                     elif vis_pos == 2:
                         success &= move_to_vision_position_2(base)
                         success &= cartesian_action_movement_pick(base, base_cyclic)
@@ -1151,6 +1142,11 @@ def main():
                 success &= move_to_home_position(base)
                 success &= closed_gripper(base)
                 success &= move_to_rest_position(base)
+            elif command1 == 'open gripper' or 'drop':
+                success &= open_gripper(base)
+            elif command1 == 'capture image':
+                speak_text("Please hold the image for 5 seconds")
+                # ic.capture_image(0)
     return 0 if success else 1
 
 
