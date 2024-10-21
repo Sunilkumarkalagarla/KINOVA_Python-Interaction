@@ -5,8 +5,9 @@ import math
 # Load the YOLO Model
 model = YOLO('yolov8n.pt')
 
-# Use IP camera
-cap = cv2.VideoCapture(1)
+# Use IP camera ("rtsp://192.168.1.10/color")
+# o or 1 uses laptop's camera
+cap = cv2.VideoCapture("rtsp://192.168.1.10/color")
 
 # ---  Distance Estimation Parameters ---
 KNOWN_WIDTH = 15  # Example: 15 cm
@@ -59,14 +60,12 @@ while True:
         cv2.imshow('frame', frame_)
 
         key = cv2.waitKey(1)
-        if key == 27:  # ESC key
+        if key == 27:  # ASCII Value of ESC key
             break
 
 # Print the list of unique detected objects
 print("Detected Objects:")
-# for obj in detected_objects:
-#     print(obj)
-print(detected_objects)
-
+for obj in detected_objects:
+    print(obj["class"])
 cap.release()
 cv2.destroyAllWindows()

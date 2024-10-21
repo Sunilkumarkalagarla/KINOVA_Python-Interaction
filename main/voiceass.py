@@ -1,13 +1,13 @@
 import sys
 import os
 import threading
+import utilities
 import time
 
 import cv2
 import pyttsx3
 import speech_recognition as sr
 import imageCapture as ic
-# import kinova_capture_image
 
 from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from kortex_api.autogen.client_stubs.BaseCyclicClientRpc import BaseCyclicClient
@@ -1057,7 +1057,7 @@ def speak_text(text):
 def main():
     # Import the utilities helper module
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-    import utilities
+
 
     # Parse arguments
     args = utilities.parseConnectionArguments()
