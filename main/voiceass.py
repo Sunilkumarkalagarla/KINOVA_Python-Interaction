@@ -140,7 +140,8 @@ def cartesian_action_movement_up(base, base_cyclic):
     else:
         print("Timeout on action notification wait")
     return finished
-def move_to_start_position(base):
+
+def move_to_a_position(base, position):
     # Make sure the arm is in Single Level Servoing mode
     base_servo_mode = Base_pb2.ServoingModeInformation()
     base_servo_mode.servoing_mode = Base_pb2.SINGLE_LEVEL_SERVOING
@@ -154,118 +155,7 @@ def move_to_start_position(base):
     action_handle_1 = None
     action_handle_2 = None
     for action in action_list.action_list:
-        if action.name == "Start":
-            action_handle_1 = action.handle
-
-    if action_handle_1 == None:
-        print("Can't reach safe position. Exiting")
-        sys.exit(0)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    base.ExecuteActionFromReference(action_handle_1)
-
-    # Leave time to action to complete
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if not finished:
-        print("Timeout on action notification wait")
-    return finished
-
-def move_to_drop_position(base):
-    # Make sure the arm is in Single Level Servoing mode
-    base_servo_mode = Base_pb2.ServoingModeInformation()
-    base_servo_mode.servoing_mode = Base_pb2.SINGLE_LEVEL_SERVOING
-    base.SetServoingMode(base_servo_mode)
-
-    # Move arm to ready position
-    print("Moving the arm to a safe position")
-    action_type = Base_pb2.RequestedActionType()
-    action_type.action_type = Base_pb2.REACH_JOINT_ANGLES
-    action_list = base.ReadAllActions(action_type)
-    action_handle_1 = None
-    action_handle_2 = None
-    for action in action_list.action_list:
-        if action.name == "Drop_pos":
-            action_handle_1 = action.handle
-
-    if action_handle_1 == None:
-        print("Can't reach safe position. Exiting")
-        sys.exit(0)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    base.ExecuteActionFromReference(action_handle_1)
-
-    # Leave time to action to complete
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if not finished:
-        print("Timeout on action notification wait")
-    return finished
-
-def move_to_home_position(base):
-    # Make sure the arm is in Single Level Servoing mode
-    base_servo_mode = Base_pb2.ServoingModeInformation()
-    base_servo_mode.servoing_mode = Base_pb2.SINGLE_LEVEL_SERVOING
-    base.SetServoingMode(base_servo_mode)
-
-    # Move arm to ready position
-    print("Moving the arm to a safe position")
-    action_type = Base_pb2.RequestedActionType()
-    action_type.action_type = Base_pb2.REACH_JOINT_ANGLES
-    action_list = base.ReadAllActions(action_type)
-    action_handle_1 = None
-    action_handle_2 = None
-    for action in action_list.action_list:
-        if action.name == "Home":
-            action_handle_1 = action.handle
-
-    if action_handle_1 == None:
-        print("Can't reach safe position. Exiting")
-        sys.exit(0)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    base.ExecuteActionFromReference(action_handle_1)
-
-    # Leave time to action to complete
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if not finished:
-        print("Timeout on action notification wait")
-    return finished
-
-def move_to_vision_position_1(base):
-    # Make sure the arm is in Single Level Servoing mode
-    base_servo_mode = Base_pb2.ServoingModeInformation()
-    base_servo_mode.servoing_mode = Base_pb2.SINGLE_LEVEL_SERVOING
-    base.SetServoingMode(base_servo_mode)
-
-    # Move arm to ready position
-    print("Moving the arm to a safe position")
-    action_type = Base_pb2.RequestedActionType()
-    action_type.action_type = Base_pb2.REACH_JOINT_ANGLES
-    action_list = base.ReadAllActions(action_type)
-    action_handle_1 = None
-    action_handle_2 = None
-    for action in action_list.action_list:
-        if action.name == "Vision_1":
+        if action.name == position:
             action_handle_1 = action.handle
 
     if action_handle_1 == None:
@@ -288,79 +178,6 @@ def move_to_vision_position_1(base):
     if not finished:
         print("Timeout on action notification wait")
     return finished
-def move_to_vision_position_2(base):
-    # Make sure the arm is in Single Level Servoing mode
-    base_servo_mode = Base_pb2.ServoingModeInformation()
-    base_servo_mode.servoing_mode = Base_pb2.SINGLE_LEVEL_SERVOING
-    base.SetServoingMode(base_servo_mode)
-
-    # Move arm to ready position
-    print("Moving the arm to a safe position")
-    action_type = Base_pb2.RequestedActionType()
-    action_type.action_type = Base_pb2.REACH_JOINT_ANGLES
-    action_list = base.ReadAllActions(action_type)
-    action_handle_1 = None
-    action_handle_2 = None
-    for action in action_list.action_list:
-        if action.name == "Vision_2":
-            action_handle_1 = action.handle
-
-    if action_handle_1 == None:
-        print("Can't reach safe position. Exiting")
-        sys.exit(0)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    base.ExecuteActionFromReference(action_handle_1)
-
-    # Leave time to action to complete
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if not finished:
-        print("Timeout on action notification wait")
-    return finished
-def move_to_rest_position(base):
-    # Make sure the arm is in Single Level Servoing mode
-    base_servo_mode = Base_pb2.ServoingModeInformation()
-    base_servo_mode.servoing_mode = Base_pb2.SINGLE_LEVEL_SERVOING
-    base.SetServoingMode(base_servo_mode)
-
-    # Move arm to ready position
-    print("Moving the arm to a safe position")
-    action_type = Base_pb2.RequestedActionType()
-    action_type.action_type = Base_pb2.REACH_JOINT_ANGLES
-    action_list = base.ReadAllActions(action_type)
-    action_handle_1 = None
-    action_handle_2 = None
-    for action in action_list.action_list:
-        if action.name == "Rest":
-            action_handle_1 = action.handle
-
-    if action_handle_1 == None:
-        print("Can't reach safe position. Exiting")
-        sys.exit(0)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    base.ExecuteActionFromReference(action_handle_1)
-
-    # Leave time to action to complete
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if not finished:
-        print("Timeout on action notification wait")
-    return finished
-
 
 def cartesian_action_movement_rest(base, base_cyclic):
     print("Starting Cartesian action movement ...")
@@ -1007,9 +824,6 @@ def cartesian_action_movement_back(base, base_cyclic):
     else:
         print("Timeout on action notification wait")
     return finished
-# def close(router,router_real_time):
-#         close_gripper(router, router_real_time, 0)
-#         return 1
 
 def listen(timeout_duration=5):
     # Create an instance of the Recognizer class
@@ -1051,25 +865,18 @@ def speak_text(text):
     engine.runAndWait()
     return None
 
-
-
-
 def main():
     # Import the utilities helper module
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-
     # Parse arguments
     args = utilities.parseConnectionArguments()
-
     # Create connection to the device and get the router
     with utilities.DeviceConnection.createTcpConnection(args) as router,utilities.DeviceConnection.createUdpConnection(
             args) as router_real_time:
         # Create required services
         base = BaseClient(router)
         base_cyclic = BaseCyclicClient(router)
-
-        speak_text("Greetings sir, what do you want me to do?")
+        speak_text("What do you want me to do?")
         success = True
         while True:
             str1 = listen()
@@ -1092,56 +899,51 @@ def main():
                 success &= go_back(base, base_cyclic)
             elif command1 == 'go home':
                 speak_text("Going Home")
-                success &= move_to_home_position(base)
+                success &= move_to_a_position(base, "Home")
             elif command1 == 'take rest':
                 speak_text("Going to rest position")
-                success &= move_to_rest_position(base)
+                success &= move_to_a_position(base, "Rest")
             elif command1 == 'turn around':
                 success &= turn_around(base, base_cyclic)
             elif command1 == 'hold object':
                 success &= gripper_close_new(base)
             elif command1 == 'stop':
                 speak_text("Thank you Very much!")
-                success &= move_to_rest_position(base)
+                success &= move_to_a_position(base, "Rest")
                 break
             elif command1 == 'pick up':
                 speak_text("Sure, Starting Pickup Routine")
                 # Example Core
                 success =True
                 iteration = 1
-                speak_text("Which product should I pick up?")
-                vis_pos_str = listen()
-                if vis_pos_str[-1] == 'one' or '1':
-                    vis_pos = 1
-                elif vis_pos_str[-1] == 'two' or '2':
-                    vis_pos = 2
-                success &= move_to_home_position(base)
+                vis_pos_str = int(input("Which product should I pick up? (1 or 2):"))
+                success &= move_to_a_position(base, "Home")
                 success &= open_gripper(base)
                 while iteration < 2:
-                    if vis_pos == 1:
-                        success &= move_to_vision_position_1(base)
+                    if vis_pos_str == 1:
+                        success &= move_to_a_position(base, "Vision_1")
                         success &= cartesian_action_movement_pick(base, base_cyclic)
                         success &= gripper_close(base)
-                        success &= move_to_home_position(base)
-                        success &= move_to_drop_position(base)
+                        success &= move_to_a_position(base, "Home")
+                        success &= move_to_a_position(base, "Drop_pos")
                         success &= cartesian_action_movement_drop(base, base_cyclic)
                         success &= open_gripper(base)
                         success &= cartesian_action_movement_up(base, base_cyclic)
-                        success &= move_to_home_position(base)
-                    elif vis_pos == 2:
-                        success &= move_to_vision_position_2(base)
+                        success &= move_to_a_position(base, "Home")
+                    elif vis_pos_str == 2:
+                        success &= move_to_a_position(base, "Vision_2")
                         success &= cartesian_action_movement_pick(base, base_cyclic)
                         success &= gripper_close(base)
-                        success &= move_to_home_position(base)
-                        success &= move_to_drop_position(base)
+                        success &= move_to_a_position(base, "Home")
+                        success &= move_to_a_position(base, "Drop_pos")
                         success &= cartesian_action_movement_drop(base, base_cyclic)
                         success &= open_gripper(base)
                         success &= cartesian_action_movement_up(base, base_cyclic)
-                        success &= move_to_home_position(base)
+                        success &= move_to_a_position(base, "Home")
                     iteration += 1
-                success &= move_to_home_position(base)
+                success &= move_to_a_position(base, "Home")
                 success &= closed_gripper(base)
-                success &= move_to_rest_position(base)
+                success &= move_to_a_position(base, "Rest")
             elif command1 == 'open gripper' or 'drop':
                 success &= open_gripper(base)
             elif command1 == 'capture image':
