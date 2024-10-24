@@ -37,8 +37,7 @@ def check_for_end_or_abort(e):
             e.set()
     return check
 
-
-def cartesian_action_movement_pick(base, base_cyclic):
+def cartesian_action_movement(base, base_cyclic, action_name):
     print("Starting Cartesian action movement ...")
     action = Base_pb2.Action()
     action.name = "Example Cartesian action movement"
@@ -46,78 +45,48 @@ def cartesian_action_movement_pick(base, base_cyclic):
 
     feedback = base_cyclic.RefreshFeedback()
 
+    if action_name == "pick":
+        feedback.base.tool_pose_y += 0.35 # (meters)
+    elif action_name == "drop":
+        feedback.base.tool_pose_z -= 0.15 # (meters)
+    elif action_name == "up":
+        feedback.base.tool_pose_z += 0.15 # (meters)
+    elif action_name == "rest":
+        feedback.base.tool_pose_z -= 0.045 # (meters)
+    elif action_name == "right":
+        feedback.base.tool_pose_theta_z += 10
+    elif action_name == "left":
+        feedback.base.tool_pose_theta_z -= 10
+    elif action_name == "front":
+        feedback.base.tool_pose_y += 0.1
+    elif action_name == "back":
+        feedback.base.tool_pose_y -= 0.1
+    elif action_name == "go_left":
+        feedback.base.tool_pose_y -= 0.05
+    elif action_name == "go_right":
+        feedback.base.tool_pose_y += 0.05
+    elif action_name == "go_up":
+        feedback.base.tool_pose_z += 0.05
+    elif action_name == "go_down":
+        feedback.base.tool_pose_z -= 0.0
+    elif action_name == "go_back":
+        feedback.base.tool_pose_x -= 0.05
+    elif action_name == "go_forward":
+        feedback.base.tool_pose_x += 0.05
+    elif action_name == "turn_left":
+        feedback.base.tool_pose_theta_z -= 90
+    elif action_name == "turn_right":
+        feedback.base.tool_pose_theta_z += 90
+    elif action_name == "turn_around":
+        feedback.base.tool_pose_theta_z -= 180
+
+
+
+
     cartesian_pose = action.reach_pose.target_pose
     cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y + 0.35 # (meters)
+    cartesian_pose.y = feedback.base.tool_pose_y # (meters)
     cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-def cartesian_action_movement_drop(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z - 0.15  # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-def cartesian_action_movement_up(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z + 0.15  # (meters)
     cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
     cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
     cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
@@ -178,464 +147,6 @@ def move_to_a_position(base, position):
     if not finished:
         print("Timeout on action notification wait")
     return finished
-
-def cartesian_action_movement_rest(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z - 0.045  # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def cartesian_action_movement_right(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z + 10  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-def cartesian_action_movement_left(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z -10 # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def go_left(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y - 0.05 # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def go_right(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y + 0.05 # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def go_up(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z + 0.05  # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def go_down(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z - 0.05  # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def go_back(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x -0.05 # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def go_forward(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x +0.05 # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def turn_left(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z - 90 # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def turn_right(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z + 90 # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
-def turn_around(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  # (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z - 180 # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-def closed_gripper(base):
-    # Make sure the arm is in Single Level Servoing mode
-    base_servo_mode = Base_pb2.ServoingModeInformation()
-    base_servo_mode.servoing_mode = Base_pb2.SINGLE_LEVEL_SERVOING
-    base.SetServoingMode(base_servo_mode)
-
-    # Move arm to ready position
-    print("Moving the arm to a safe position")
-    action_type = Base_pb2.RequestedActionType()
-    action_type.action_type = Base_pb2.SEND_GRIPPER_COMMAND
-    action_list = base.ReadAllActions(action_type)
-    action_handle_1 = None
-    action_handle_2 = None
-    for action in action_list.action_list:
-        if action.name == "closed_gripper":
-            action_handle_1 = action.handle
-        # print(action.name)
-        # print(action.handle)
-
-    if action_handle_1 == None:
-        print("Can't reach safe position. Exiting")
-        sys.exit(0)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    base.ExecuteActionFromReference(action_handle_1)
-
-    # Leave time to action to complete
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if not finished:
-        print("Timeout on action notification wait")
-    return finished
-
 
 def open_gripper(base):
     # Make sure the arm is in Single Level Servoing mode
@@ -755,76 +266,6 @@ def gripper_close_new(base):
         print("Timeout on action notification wait")
     return finished
 
-
-def cartesian_action_movement_front(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  + 0.1# (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-def cartesian_action_movement_back(base, base_cyclic):
-    print("Starting Cartesian action movement ...")
-    action = Base_pb2.Action()
-    action.name = "Example Cartesian action movement"
-    action.application_data = ""
-
-    feedback = base_cyclic.RefreshFeedback()
-
-    cartesian_pose = action.reach_pose.target_pose
-    cartesian_pose.x = feedback.base.tool_pose_x  # (meters)
-    cartesian_pose.y = feedback.base.tool_pose_y  - 0.1# (meters)
-    cartesian_pose.z = feedback.base.tool_pose_z   # (meters)
-    cartesian_pose.theta_x = feedback.base.tool_pose_theta_x  # (degrees)
-    cartesian_pose.theta_y = feedback.base.tool_pose_theta_y  # (degrees)
-    cartesian_pose.theta_z = feedback.base.tool_pose_theta_z  # (degrees)
-
-    e = threading.Event()
-    notification_handle = base.OnNotificationActionTopic(
-        check_for_end_or_abort(e),
-        Base_pb2.NotificationOptions()
-    )
-
-    print("Executing action")
-    base.ExecuteAction(action)
-
-    print("Waiting for movement to finish ...")
-    finished = e.wait(TIMEOUT_DURATION)
-    base.Unsubscribe(notification_handle)
-
-    if finished:
-        print("Cartesian movement completed")
-    else:
-        print("Timeout on action notification wait")
-    return finished
-
 def listen(timeout_duration=5):
     # Create an instance of the Recognizer class
     recognizer = sr.Recognizer()
@@ -882,21 +323,21 @@ def main():
             str1 = listen()
             command1 = str1
             if command1 == 'go left':
-                success &= go_left(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "go_left")
             elif command1 == 'go right':
-                success &= go_right(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "go_right")
             elif command1 == 'go up':
-                success &= go_up(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "go_up")
             elif command1 == 'go down':
-                success &= go_down(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "go_down")
             elif command1 == 'turn left':
-                success &= turn_left(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "turn_left")
             elif command1 == 'turn right':
-                success &= turn_right(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "turn_right")
             elif command1 == 'go_forward':
-                success &= go_forward(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "go_forward")
             elif command1 == 'go back':
-                success &= go_back(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "go_back")
             elif command1 == 'go home':
                 speak_text("Going Home")
                 success &= move_to_a_position(base, "Home")
@@ -904,7 +345,7 @@ def main():
                 speak_text("Going to rest position")
                 success &= move_to_a_position(base, "Rest")
             elif command1 == 'turn around':
-                success &= turn_around(base, base_cyclic)
+                success &= cartesian_action_movement(base, base_cyclic, "turn_around")
             elif command1 == 'hold object':
                 success &= gripper_close_new(base)
             elif command1 == 'stop':
@@ -915,34 +356,33 @@ def main():
                 speak_text("Sure, Starting Pickup Routine")
                 # Example Core
                 success =True
-                iteration = 1
+                # iteration = 1
                 vis_pos_str = int(input("Which product should I pick up? (1 or 2):"))
                 success &= move_to_a_position(base, "Home")
                 success &= open_gripper(base)
-                while iteration < 2:
-                    if vis_pos_str == 1:
-                        success &= move_to_a_position(base, "Vision_1")
-                        success &= cartesian_action_movement_pick(base, base_cyclic)
-                        success &= gripper_close(base)
-                        success &= move_to_a_position(base, "Home")
-                        success &= move_to_a_position(base, "Drop_pos")
-                        success &= cartesian_action_movement_drop(base, base_cyclic)
-                        success &= open_gripper(base)
-                        success &= cartesian_action_movement_up(base, base_cyclic)
-                        success &= move_to_a_position(base, "Home")
-                    elif vis_pos_str == 2:
-                        success &= move_to_a_position(base, "Vision_2")
-                        success &= cartesian_action_movement_pick(base, base_cyclic)
-                        success &= gripper_close(base)
-                        success &= move_to_a_position(base, "Home")
-                        success &= move_to_a_position(base, "Drop_pos")
-                        success &= cartesian_action_movement_drop(base, base_cyclic)
-                        success &= open_gripper(base)
-                        success &= cartesian_action_movement_up(base, base_cyclic)
-                        success &= move_to_a_position(base, "Home")
-                    iteration += 1
+                # while iteration < 2:
+                if vis_pos_str == 1:
+                    success &= move_to_a_position(base, "Vision_1")
+                    success &= cartesian_action_movement(base, base_cyclic, "pick")
+                    success &= gripper_close(base)
+                    success &= move_to_a_position(base, "Home")
+                    success &= move_to_a_position(base, "Drop_pos")
+                    success &= cartesian_action_movement(base, base_cyclic, "drop")
+                    success &= open_gripper(base)
+                    success &= cartesian_action_movement(base, base_cyclic, "up")
+                    success &= move_to_a_position(base, "Home")
+                elif vis_pos_str == 2:
+                    success &= move_to_a_position(base, "Vision_2")
+                    success &= cartesian_action_movement(base, base_cyclic, "pick")
+                    success &= gripper_close(base)
+                    success &= move_to_a_position(base, "Home")
+                    success &= move_to_a_position(base, "Drop_pos")
+                    success &= cartesian_action_movement(base, base_cyclic, "drop")
+                    success &= open_gripper(base)
+                    success &= cartesian_action_movement(base, base_cyclic, "up")
+                    success &= move_to_a_position(base, "Home")
+                    # iteration += 1
                 success &= move_to_a_position(base, "Home")
-                success &= closed_gripper(base)
                 success &= move_to_a_position(base, "Rest")
             elif command1 == 'open gripper' or 'drop':
                 success &= open_gripper(base)
