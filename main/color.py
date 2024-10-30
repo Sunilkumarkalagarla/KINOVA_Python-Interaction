@@ -27,7 +27,7 @@ def get_dominant_color(hsv_roi):
 
     return color
 
-# Access the camera with ID 2
+# Access the internal camera with ID 1
 cap = cv2.VideoCapture(1)
 
 if not cap.isOpened():
