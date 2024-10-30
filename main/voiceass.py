@@ -8,6 +8,7 @@ import cv2
 import pyttsx3
 import speech_recognition as sr
 # import imageCapture as ic
+import color
 
 from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from kortex_api.autogen.client_stubs.BaseCyclicClientRpc import BaseCyclicClient
@@ -202,7 +203,7 @@ def gripper_close(base):
     action_handle_1 = None
     action_handle_2 = None
     for action in action_list.action_list:
-        if action.name == "gripper_close":
+        if action.name == "water_gripper_hold":
             action_handle_1 = action.handle
         # print(action.name)
         # print(action.handle)
@@ -354,36 +355,32 @@ def main():
                 break
             elif command1 == 'pick up':
                 speak_text("Sure, Starting Pickup Routine")
-                # Example Core
                 success =True
-                # iteration = 1
-                vis_pos_str = int(input("Which product should I pick up? (1 or 2):"))
+                vis_pos_str = int(input("Which product should I pick up? (1 or 2 or 3):"))
                 success &= move_to_a_position(base, "Home")
                 success &= open_gripper(base)
-                # while iteration < 2:
+
                 if vis_pos_str == 1:
-                    success &= move_to_a_position(base, "Vision_1")
-                    success &= cartesian_action_movement(base, base_cyclic, "pick")
+                    success &= move_to_a_position(base, "Home")
+                    success &= move_to_a_position(base, "Bottle1_Top")
+                    success &= move_to_a_position(base, "Bottle1_Hold_Pos")
                     success &= gripper_close(base)
-                    success &= move_to_a_position(base, "Home")
-                    success &= move_to_a_position(base, "Drop_pos")
-                    success &= cartesian_action_movement(base, base_cyclic, "drop")
-                    success &= open_gripper(base)
-                    success &= cartesian_action_movement(base, base_cyclic, "up")
-                    success &= move_to_a_position(base, "Home")
+                    success &= move_to_a_position(base, "Bottle1_Top")
                 elif vis_pos_str == 2:
-                    success &= move_to_a_position(base, "Vision_2")
-                    success &= cartesian_action_movement(base, base_cyclic, "pick")
+                    success &= move_to_a_position(base, "Home")
+                    success &= move_to_a_position(base, "Bottle2_Top")
+                    success &= move_to_a_position(base, "Bottle2_Hold_Pos")
                     success &= gripper_close(base)
+                    success &= move_to_a_position(base, "Bottle2_Top")
+                elif vis_pos_str == 3:
                     success &= move_to_a_position(base, "Home")
-                    success &= move_to_a_position(base, "Drop_pos")
-                    success &= cartesian_action_movement(base, base_cyclic, "drop")
-                    success &= open_gripper(base)
-                    success &= cartesian_action_movement(base, base_cyclic, "up")
-                    success &= move_to_a_position(base, "Home")
-                    # iteration += 1
+                    success &= move_to_a_position(base, "Bottle3_Top")
+                    success &= move_to_a_position(base, "Bottle3_Hold_Pos")
+                    success &= gripper_close(base)
+                    success &= move_to_a_position(base, "Bottle3_Top")
                 success &= move_to_a_position(base, "Home")
                 success &= move_to_a_position(base, "Rest")
+                success &= open_gripper(base)
             elif command1 == 'open gripper' or 'drop':
                 success &= open_gripper(base)
             elif command1 == 'capture image':
