@@ -307,8 +307,6 @@ def speak_text(text):
     engine.runAndWait()
     return None
 
-def testfunction():
-    print("This Function is just to test Git Hub from VS Code")
 
 def main():
     # Import the utilities helper module
