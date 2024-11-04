@@ -307,6 +307,9 @@ def speak_text(text):
     engine.runAndWait()
     return None
 
+def testfunction():
+    print("This Function is just to test Git Hub from VS Code")
+
 def main():
     # Import the utilities helper module
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
