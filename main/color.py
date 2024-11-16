@@ -26,45 +26,50 @@ def get_dominant_color(hsv_roi):
         color = "Gray or Black (Low Saturation/Value)"
 
     return color
+def get_the_color(color_code):
+    # Access the internal camera with ID 1
+    # Use IP camera ("rtsp://192.168.1.10/color")
+    cap = cv2.VideoCapture(1)
+    print("I'm in the Color Code")
 
-# Access the internal camera with ID 1
-cap = cv2.VideoCapture(1)
+    if not cap.isOpened():
+        print("Error: Could not open camera.")
+        exit()
 
-if not cap.isOpened():
-    print("Error: Could not open camera.")
-    exit()
+    # Parameters for capturing multiple frames
+    num_frames = 10  # Number of frames to capture
+    colors_detected = []
 
-# Parameters for capturing multiple frames
-num_frames = 10  # Number of frames to capture
-colors_detected = []
+    for _ in range(num_frames):
+        # Capture a single frame
+        ret, frame = cap.read()
+        if not ret:
+            print("Failed to grab frame")
+            continue
 
-for _ in range(num_frames):
-    # Capture a single frame
-    ret, frame = cap.read()
-    if not ret:
-        print("Failed to grab frame")
-        continue
+        # Define the region of interest (ROI) in the center of the frame
+        height, width, _ = frame.shape
+        cx, cy = width // 2, height // 2
+        roi_size = 50  # Size of the central area
+        roi = frame[cy - roi_size:cy + roi_size, cx - roi_size:cx + roi_size]
 
-    # Define the region of interest (ROI) in the center of the frame
-    height, width, _ = frame.shape
-    cx, cy = width // 2, height // 2
-    roi_size = 50  # Size of the central area
-    roi = frame[cy - roi_size:cy + roi_size, cx - roi_size:cx + roi_size]
+        # Convert the ROI to HSV color space
+        hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
-    # Convert the ROI to HSV color space
-    hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+        # Get the dominant color in the ROI and add it to the list
+        dominant_color = get_dominant_color(hsv_roi)
+        colors_detected.append(dominant_color)
 
-    # Get the dominant color in the ROI and add it to the list
-    dominant_color = get_dominant_color(hsv_roi)
-    colors_detected.append(dominant_color)
+    # Release the camera after capturing the frames
+    cap.release()
 
-# Release the camera after capturing the frames
-cap.release()
-
-# Calculate the most frequently detected color
-if colors_detected:
-    most_common_color = max(set(colors_detected), key=colors_detected.count)
-    print("Detected color (most common across frames):", most_common_color)
-    # ?return most_common_color
-else:
-    print("No color detected.")
+    # Calculate the most frequently detected color
+    if colors_detected:
+        most_common_color = max(set(colors_detected), key=colors_detected.count)
+        print("Detected color (most common across frames):", most_common_color)
+        if most_common_color == color_code:
+            return True
+        else:
+            return False
+    else:
+        print("No color detected.")

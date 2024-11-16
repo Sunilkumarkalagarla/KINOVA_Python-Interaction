@@ -1,19 +1,19 @@
-import sys
 import os
+import sys
 import threading
-import utilities
-import time
 
-import cv2
 import pyttsx3
 import speech_recognition as sr
-# import imageCapture as ic
-import color
-
 from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from kortex_api.autogen.client_stubs.BaseCyclicClientRpc import BaseCyclicClient
+from kortex_api.autogen.messages import Base_pb2
 
-from kortex_api.autogen.messages import Base_pb2, BaseCyclic_pb2, Common_pb2
+import utilities
+# import color
+import cv2
+import numpy as np
+
+# import imageCapture as ic
 # from gripper_close import close_gripper
 
 
@@ -296,6 +296,36 @@ def listen(timeout_duration=5):
         print("Listening timed out while waiting for phrase to start.")
         return None
 
+def pick_object(i):
+    # Import the utilities helper module
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+    # Parse arguments
+    args = utilities.parseConnectionArguments()
+    # Create connection to the device and get the router
+    with utilities.DeviceConnection.createTcpConnection(args) as router, utilities.DeviceConnection.createUdpConnection(
+            args) as router_real_time:
+        # Create required services
+        base = BaseClient(router)
+        success = True
+    if i:
+        success &= move_to_a_position(base, "Bottle1_Top")
+        success &= move_to_a_position(base, "Bottle1_Hold_Pos")
+        success &= gripper_close(base)
+        success &= move_to_a_position(base, "Bottle1_Top")
+    elif i == 2:
+        success &= move_to_a_position(base, "Bottle2_Top")
+        success &= move_to_a_position(base, "Bottle2_Hold_Pos")
+        success &= gripper_close(base)
+        success &= move_to_a_position(base, "Bottle2_Top")
+    elif i == 3:
+        success &= move_to_a_position(base, "Bottle3_Top")
+        success &= move_to_a_position(base, "Bottle3_Hold_Pos")
+        success &= gripper_close(base)
+        success &= move_to_a_position(base, "Bottle3_Top")
+    success &= move_to_a_position(base, "Home")
+    success &= move_to_a_position(base, "Rest")
+    success &= open_gripper(base)
+
 def speak_text(text):
     # Initialize the text-to-speech engine
     engine = pyttsx3.init()
@@ -307,6 +337,78 @@ def speak_text(text):
     engine.runAndWait()
     return None
 
+# Define a function to get the dominant color in a given region of interest (ROI)
+def get_dominant_color(hsv_roi):
+    # Calculate the mean of each channel in the HSV space
+    mean_hue = np.mean(hsv_roi[:, :, 0])
+    mean_saturation = np.mean(hsv_roi[:, :, 1])
+    mean_value = np.mean(hsv_roi[:, :, 2])
+
+    # Determine the color based on the hue
+    if mean_saturation > 50 and mean_value > 50:
+        if 0 <= mean_hue < 15 or 165 < mean_hue <= 180:
+            color = "Red"
+        elif 15 <= mean_hue < 35:
+            color = "Yellow"
+        elif 35 <= mean_hue < 85:
+            color = "Green"
+        elif 85 <= mean_hue < 125:
+            color = "Blue"
+        elif 125 <= mean_hue < 165:
+            color = "Purple"
+        else:
+            color = "Unknown"
+    else:
+        color = "Gray or Black (Low Saturation/Value)"
+
+    return color
+def get_the_color(color_code):
+    # Access the internal camera with ID 1
+    # Use IP camera ("rtsp://192.168.1.10/color")
+    cap = cv2.VideoCapture(1)
+    print("I'm in the Color Code")
+
+    if not cap.isOpened():
+        print("Error: Could not open camera.")
+        exit()
+
+    # Parameters for capturing multiple frames
+    num_frames = 10  # Number of frames to capture
+    colors_detected = []
+
+    for _ in range(num_frames):
+        # Capture a single frame
+        ret, frame = cap.read()
+        if not ret:
+            print("Failed to grab frame")
+            continue
+
+        # Define the region of interest (ROI) in the center of the frame
+        height, width, _ = frame.shape
+        cx, cy = width // 2, height // 2
+        roi_size = 50  # Size of the central area
+        roi = frame[cy - roi_size:cy + roi_size, cx - roi_size:cx + roi_size]
+
+        # Convert the ROI to HSV color space
+        hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+
+        # Get the dominant color in the ROI and add it to the list
+        dominant_color = get_dominant_color(hsv_roi)
+        colors_detected.append(dominant_color)
+
+    # Release the camera after capturing the frames
+    cap.release()
+
+    # Calculate the most frequently detected color
+    if colors_detected:
+        most_common_color = max(set(colors_detected), key=colors_detected.count)
+        print("Detected color (most common across frames):", most_common_color)
+        if most_common_color == color_code:
+            return True
+        else:
+            return False
+    else:
+        print("No color detected.")
 
 def main():
     # Import the utilities helper module
@@ -319,11 +421,11 @@ def main():
         # Create required services
         base = BaseClient(router)
         base_cyclic = BaseCyclicClient(router)
-        speak_text("What do you want me to do?")
+        # speak_text("What do you want me to do?")
         success = True
         while True:
-            str1 = listen()
-            command1 = str1
+            # str1 = listen()
+            command1 = input("What do you want me to do now?: ")
             if command1 == 'go left':
                 success &= cartesian_action_movement(base, base_cyclic, "go_left")
             elif command1 == 'go right':
@@ -355,33 +457,20 @@ def main():
                 success &= move_to_a_position(base, "Rest")
                 break
             elif command1 == 'pick up':
-                speak_text("Sure, Starting Pickup Routine")
-                success =True
-                vis_pos_str = int(input("Which product should I pick up? (1 or 2 or 3):"))
+                # speak_text("Sure, Starting Pickup Routine")
+                # vis_pos_str = int(input("Which product should I pick up? (1 or 2 or 3):"))
                 success &= move_to_a_position(base, "Home")
                 success &= open_gripper(base)
-
-                if vis_pos_str == 1:
-                    success &= move_to_a_position(base, "Home")
-                    success &= move_to_a_position(base, "Bottle1_Top")
-                    success &= move_to_a_position(base, "Bottle1_Hold_Pos")
-                    success &= gripper_close(base)
-                    success &= move_to_a_position(base, "Bottle1_Top")
-                elif vis_pos_str == 2:
-                    success &= move_to_a_position(base, "Home")
-                    success &= move_to_a_position(base, "Bottle2_Top")
-                    success &= move_to_a_position(base, "Bottle2_Hold_Pos")
-                    success &= gripper_close(base)
-                    success &= move_to_a_position(base, "Bottle2_Top")
-                elif vis_pos_str == 3:
-                    success &= move_to_a_position(base, "Home")
-                    success &= move_to_a_position(base, "Bottle3_Top")
-                    success &= move_to_a_position(base, "Bottle3_Hold_Pos")
-                    success &= gripper_close(base)
-                    success &= move_to_a_position(base, "Bottle3_Top")
-                success &= move_to_a_position(base, "Home")
-                success &= move_to_a_position(base, "Rest")
-                success &= open_gripper(base)
+                position = ["Bottle1_Watch_Pos", "Bottle2_Watch_Pos", "Bottle3_Watch_Pos"]
+                success = True
+                color_code = input("Which color code would you like to pickup?: ")
+                for i in range(3):
+                    success &= move_to_a_position(base, position[i])
+                    if get_the_color(color_code):
+                        pick_object(i)
+                        break
+                else:
+                    speak_text("Please Check is you have that color or it's my camera's fault!")
             elif command1 == 'open gripper' or 'drop':
                 success &= open_gripper(base)
             elif command1 == 'capture image':
