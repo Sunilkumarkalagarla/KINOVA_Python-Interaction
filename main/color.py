@@ -73,3 +73,4 @@ def get_the_color(color_code):
             return False
     else:
         print("No color detected.")
+print(get_the_color("Blue"))

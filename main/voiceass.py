@@ -307,24 +307,24 @@ def pick_object(i):
         # Create required services
         base = BaseClient(router)
         success = True
-    if i:
-        success &= move_to_a_position(base, "Bottle1_Top")
-        success &= move_to_a_position(base, "Bottle1_Hold_Pos")
-        success &= gripper_close(base)
-        success &= move_to_a_position(base, "Bottle1_Top")
-    elif i == 2:
-        success &= move_to_a_position(base, "Bottle2_Top")
-        success &= move_to_a_position(base, "Bottle2_Hold_Pos")
-        success &= gripper_close(base)
-        success &= move_to_a_position(base, "Bottle2_Top")
-    elif i == 3:
-        success &= move_to_a_position(base, "Bottle3_Top")
-        success &= move_to_a_position(base, "Bottle3_Hold_Pos")
-        success &= gripper_close(base)
-        success &= move_to_a_position(base, "Bottle3_Top")
-    success &= move_to_a_position(base, "Home")
-    success &= move_to_a_position(base, "Rest")
-    success &= open_gripper(base)
+        if i:
+            success &= move_to_a_position(base, "Bottle1_Top")
+            success &= move_to_a_position(base, "Bottle1_Hold_Pos")
+            success &= gripper_close(base)
+            success &= move_to_a_position(base, "Bottle1_Top")
+        elif i == 2:
+            success &= move_to_a_position(base, "Bottle2_Top")
+            success &= move_to_a_position(base, "Bottle2_Hold_Pos")
+            success &= gripper_close(base)
+            success &= move_to_a_position(base, "Bottle2_Top")
+        elif i == 3:
+            success &= move_to_a_position(base, "Bottle3_Top")
+            success &= move_to_a_position(base, "Bottle3_Hold_Pos")
+            success &= gripper_close(base)
+            success &= move_to_a_position(base, "Bottle3_Top")
+        success &= move_to_a_position(base, "Home")
+        success &= move_to_a_position(base, "Rest")
+        success &= open_gripper(base)
 
 def speak_text(text):
     # Initialize the text-to-speech engine
@@ -411,6 +411,7 @@ def get_the_color(color_code):
         print("No color detected.")
 
 def main():
+    # pick_object(1)
     # Import the utilities helper module
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     # Parse arguments
@@ -457,6 +458,8 @@ def main():
                 success &= move_to_a_position(base, "Rest")
                 break
             elif command1 == 'pick up':
+                # sampleEnter = int(input("Enter a number for fun: "))
+                # pick_object(sampleEnter)
                 # speak_text("Sure, Starting Pickup Routine")
                 # vis_pos_str = int(input("Which product should I pick up? (1 or 2 or 3):"))
                 success &= move_to_a_position(base, "Home")
