@@ -308,16 +308,19 @@ def pick_object(i):
         base = BaseClient(router)
         success = True
         if i:
+            success &= move_to_a_position(base, "Home")
             success &= move_to_a_position(base, "Bottle1_Top")
             success &= move_to_a_position(base, "Bottle1_Hold_Pos")
             success &= gripper_close(base)
             success &= move_to_a_position(base, "Bottle1_Top")
         elif i == 2:
+            success &= move_to_a_position(base, "Home")
             success &= move_to_a_position(base, "Bottle2_Top")
             success &= move_to_a_position(base, "Bottle2_Hold_Pos")
             success &= gripper_close(base)
             success &= move_to_a_position(base, "Bottle2_Top")
         elif i == 3:
+            success &= move_to_a_position(base, "Home")
             success &= move_to_a_position(base, "Bottle3_Top")
             success &= move_to_a_position(base, "Bottle3_Hold_Pos")
             success &= gripper_close(base)
@@ -325,6 +328,7 @@ def pick_object(i):
         success &= move_to_a_position(base, "Home")
         success &= move_to_a_position(base, "Rest")
         success &= open_gripper(base)
+    return 0
 
 def speak_text(text):
     # Initialize the text-to-speech engine
@@ -411,11 +415,12 @@ def get_the_color(color_code):
         print("No color detected.")
 
 def main():
-    # pick_object(1)
+    pick_object(1)
     # Import the utilities helper module
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     # Parse arguments
     args = utilities.parseConnectionArguments()
+    success = True
     # Create connection to the device and get the router
     with utilities.DeviceConnection.createTcpConnection(args) as router,utilities.DeviceConnection.createUdpConnection(
             args) as router_real_time:
@@ -423,7 +428,6 @@ def main():
         base = BaseClient(router)
         base_cyclic = BaseCyclicClient(router)
         # speak_text("What do you want me to do?")
-        success = True
         while True:
             # str1 = listen()
             command1 = input("What do you want me to do now?: ")
