@@ -1,6 +1,7 @@
 import os
 import sys
 import threading
+import time
 
 import pyttsx3
 import speech_recognition as sr
@@ -296,39 +297,44 @@ def listen(timeout_duration=5):
         print("Listening timed out while waiting for phrase to start.")
         return None
 
-def pick_object(i):
-    # Import the utilities helper module
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-    # Parse arguments
-    args = utilities.parseConnectionArguments()
-    # Create connection to the device and get the router
-    with utilities.DeviceConnection.createTcpConnection(args) as router, utilities.DeviceConnection.createUdpConnection(
-            args) as router_real_time:
-        # Create required services
-        base = BaseClient(router)
-        success = True
-        if i:
-            success &= move_to_a_position(base, "Home")
-            success &= move_to_a_position(base, "Bottle1_Top")
-            success &= move_to_a_position(base, "Bottle1_Hold_Pos")
-            success &= gripper_close(base)
-            success &= move_to_a_position(base, "Bottle1_Top")
-        elif i == 2:
-            success &= move_to_a_position(base, "Home")
-            success &= move_to_a_position(base, "Bottle2_Top")
-            success &= move_to_a_position(base, "Bottle2_Hold_Pos")
-            success &= gripper_close(base)
-            success &= move_to_a_position(base, "Bottle2_Top")
-        elif i == 3:
-            success &= move_to_a_position(base, "Home")
-            success &= move_to_a_position(base, "Bottle3_Top")
-            success &= move_to_a_position(base, "Bottle3_Hold_Pos")
-            success &= gripper_close(base)
-            success &= move_to_a_position(base, "Bottle3_Top")
-        success &= move_to_a_position(base, "Home")
-        success &= move_to_a_position(base, "Rest")
-        success &= open_gripper(base)
-    return 0
+# def pick_object(i):
+#     print("I am in Pick Object Function Right Now")
+#     # Import the utilities helper module
+#     # sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+#     # Parse arguments
+#     args = utilities.parseConnectionArguments()
+#     # Create connection to the device and get the router
+#     with utilities.DeviceConnection.createTcpConnection(args) as router, utilities.DeviceConnection.createUdpConnection(
+#             args) as router_real_time:
+#         # Create required services
+#         base = BaseClient(router)
+#         success = True
+#         if i == 1:
+#             print("I am at bottle 1 pick up code.")
+#             success &= move_to_a_position(base, "Home")
+#             success &= move_to_a_position(base, "Bottle1_Top")
+#             success &= move_to_a_position(base, "Bottle1_Hold_Pos")
+#             success &= gripper_close(base)
+#             success &= move_to_a_position(base, "Bottle1_Top")
+#         elif i == 2:
+#             print("I am at bottle 2 pick up code.")
+#             success &= move_to_a_position(base, "Home")
+#             success &= move_to_a_position(base, "Bottle2_Top")
+#             success &= move_to_a_position(base, "Bottle2_Hold_Pos")
+#             success &= gripper_close(base)
+#             success &= move_to_a_position(base, "Bottle2_Top")
+#         elif i == 3:
+#             print("I am at bottle 3 pick up code.")
+#             success &= move_to_a_position(base, "Home")
+#             success &= move_to_a_position(base, "Bottle3_Top")
+#             success &= move_to_a_position(base, "Bottle3_Hold_Pos")
+#             success &= gripper_close(base)
+#             success &= move_to_a_position(base, "Bottle3_Top")
+#         success &= move_to_a_position(base, "Home")
+#         success &= move_to_a_position(base, "Rest")
+#         success &= open_gripper(base)
+#     return True
+
 
 def speak_text(text):
     # Initialize the text-to-speech engine
@@ -415,7 +421,6 @@ def get_the_color(color_code):
         print("No color detected.")
 
 def main():
-    pick_object(1)
     # Import the utilities helper module
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
     # Parse arguments
@@ -459,23 +464,48 @@ def main():
                 success &= gripper_close_new(base)
             elif command1 == 'stop':
                 speak_text("Thank you Very much!")
+                success &= move_to_a_position(base, "Home")
                 success &= move_to_a_position(base, "Rest")
                 break
             elif command1 == 'pick up':
-                # sampleEnter = int(input("Enter a number for fun: "))
-                # pick_object(sampleEnter)
-                # speak_text("Sure, Starting Pickup Routine")
-                # vis_pos_str = int(input("Which product should I pick up? (1 or 2 or 3):"))
-                success &= move_to_a_position(base, "Home")
                 success &= open_gripper(base)
-                position = ["Bottle1_Watch_Pos", "Bottle2_Watch_Pos", "Bottle3_Watch_Pos"]
+                pos = ["Bottle1_Watch_Pos", "Bottle2_Watch_Pos", "Bottle3_Watch_Pos"]
                 success = True
                 color_code = input("Which color code would you like to pickup?: ")
+                success &= move_to_a_position(base, "Home")
                 for i in range(3):
-                    success &= move_to_a_position(base, position[i])
+                    success &= move_to_a_position(base, pos[i])
+                    # time.sleep(1)
                     if get_the_color(color_code):
-                        pick_object(i)
-                        break
+                        if i == 0:
+                            success &= move_to_a_position(base, "Bottle1_Top")
+                            success &= move_to_a_position(base, "Bottle1_Hold_Pos")
+                            success &= gripper_close(base)
+                            success &= move_to_a_position(base, "Bottle1_Top")
+                            success &= move_to_a_position(base, "Home")
+                            success &= move_to_a_position(base, "Rest")
+                            success &= open_gripper(base)
+                            break
+                        elif i == 1:
+                            success &= move_to_a_position(base, "Home")
+                            success &= move_to_a_position(base, "Bottle2_Top")
+                            success &= move_to_a_position(base, "Bottle2_Hold_Pos")
+                            success &= gripper_close(base)
+                            success &= move_to_a_position(base, "Bottle2_Top")
+                            success &= move_to_a_position(base, "Home")
+                            success &= move_to_a_position(base, "Rest")
+                            success &= open_gripper(base)
+                            break
+                        elif i == 2:
+                            success &= move_to_a_position(base, "Home")
+                            success &= move_to_a_position(base, "Bottle3_Top")
+                            success &= move_to_a_position(base, "Bottle3_Hold_Pos")
+                            success &= gripper_close(base)
+                            success &= move_to_a_position(base, "Bottle3_Top")
+                            success &= move_to_a_position(base, "Home")
+                            success &= move_to_a_position(base, "Rest")
+                            success &= open_gripper(base)
+                            break
                 else:
                     speak_text("Please Check is you have that color or it's my camera's fault!")
             elif command1 == 'open gripper' or 'drop':

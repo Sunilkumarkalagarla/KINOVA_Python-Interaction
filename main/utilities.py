@@ -72,7 +72,7 @@ class DeviceConnection:
         
         self.transport.connect(self.ipAddress, self.port)
 
-        if (self.credentials[0] != ""):
+        if self.credentials[0] != "":
             session_info = Session_pb2.CreateSessionInfo()
             session_info.username = self.credentials[0]
             session_info.password = self.credentials[1]
@@ -88,7 +88,7 @@ class DeviceConnection:
     # Called when exiting 'with' statement
     def __exit__(self, exc_type, exc_value, traceback):
     
-        if self.sessionManager != None:
+        if self.sessionManager is not None:
 
             router_options = RouterClientSendOptions()
             router_options.timeout_ms = 1000 

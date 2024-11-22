@@ -29,7 +29,7 @@ def get_dominant_color(hsv_roi):
 def get_the_color(color_code):
     # Access the internal camera with ID 1
     # Use IP camera ("rtsp://192.168.1.10/color")
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture("rtsp://192.168.1.10/color")
     print("I'm in the Color Code")
 
     if not cap.isOpened():
