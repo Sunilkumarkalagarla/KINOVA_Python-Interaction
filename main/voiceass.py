@@ -297,45 +297,6 @@ def listen(timeout_duration=5):
         print("Listening timed out while waiting for phrase to start.")
         return None
 
-# def pick_object(i):
-#     print("I am in Pick Object Function Right Now")
-#     # Import the utilities helper module
-#     # sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-#     # Parse arguments
-#     args = utilities.parseConnectionArguments()
-#     # Create connection to the device and get the router
-#     with utilities.DeviceConnection.createTcpConnection(args) as router, utilities.DeviceConnection.createUdpConnection(
-#             args) as router_real_time:
-#         # Create required services
-#         base = BaseClient(router)
-#         success = True
-#         if i == 1:
-#             print("I am at bottle 1 pick up code.")
-#             success &= move_to_a_position(base, "Home")
-#             success &= move_to_a_position(base, "Bottle1_Top")
-#             success &= move_to_a_position(base, "Bottle1_Hold_Pos")
-#             success &= gripper_close(base)
-#             success &= move_to_a_position(base, "Bottle1_Top")
-#         elif i == 2:
-#             print("I am at bottle 2 pick up code.")
-#             success &= move_to_a_position(base, "Home")
-#             success &= move_to_a_position(base, "Bottle2_Top")
-#             success &= move_to_a_position(base, "Bottle2_Hold_Pos")
-#             success &= gripper_close(base)
-#             success &= move_to_a_position(base, "Bottle2_Top")
-#         elif i == 3:
-#             print("I am at bottle 3 pick up code.")
-#             success &= move_to_a_position(base, "Home")
-#             success &= move_to_a_position(base, "Bottle3_Top")
-#             success &= move_to_a_position(base, "Bottle3_Hold_Pos")
-#             success &= gripper_close(base)
-#             success &= move_to_a_position(base, "Bottle3_Top")
-#         success &= move_to_a_position(base, "Home")
-#         success &= move_to_a_position(base, "Rest")
-#         success &= open_gripper(base)
-#     return True
-
-
 def speak_text(text):
     # Initialize the text-to-speech engine
     engine = pyttsx3.init()
