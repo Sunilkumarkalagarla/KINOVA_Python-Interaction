@@ -336,7 +336,7 @@ def get_dominant_color(hsv_roi):
 def get_the_color(color_code):
     # Access the internal camera with ID 1
     # Use IP camera ("rtsp://192.168.1.10/color")
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture("rtsp://192.168.1.10/color")
     print("I'm in the Color Code")
 
     if not cap.isOpened():
@@ -445,27 +445,27 @@ def main():
                             success &= move_to_a_position(base, "Bottle1_Top")
                             success &= move_to_a_position(base, "Home")
                             success &= move_to_a_position(base, "Rest")
-                            success &= open_gripper(base)
+                            # success &= open_gripper(base)
                             break
                         elif i == 1:
-                            success &= move_to_a_position(base, "Home")
+                            # success &= move_to_a_position(base, "Home")
                             success &= move_to_a_position(base, "Bottle2_Top")
                             success &= move_to_a_position(base, "Bottle2_Hold_Pos")
                             success &= gripper_close(base)
                             success &= move_to_a_position(base, "Bottle2_Top")
                             success &= move_to_a_position(base, "Home")
                             success &= move_to_a_position(base, "Rest")
-                            success &= open_gripper(base)
+                            # success &= open_gripper(base)
                             break
                         elif i == 2:
-                            success &= move_to_a_position(base, "Home")
+                            # success &= move_to_a_position(base, "Home")
                             success &= move_to_a_position(base, "Bottle3_Top")
                             success &= move_to_a_position(base, "Bottle3_Hold_Pos")
                             success &= gripper_close(base)
                             success &= move_to_a_position(base, "Bottle3_Top")
                             success &= move_to_a_position(base, "Home")
                             success &= move_to_a_position(base, "Rest")
-                            success &= open_gripper(base)
+                            # success &= open_gripper(base)
                             break
                 else:
                     speak_text("Please Check is you have that color or it's my camera's fault!")
